@@ -1,0 +1,21 @@
+{
+  "appId": "com.laraberbel.iris",
+  "productName": "Iris",
+  "directories": {
+    "output": "dist"
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "laraberbel",
+    "repo": "iris"
+  },
+  "win": {
+    "target": ["nsis"],
+    "icon": "assets/icon.ico"
+  },
+  "mac": {
+    "target": ["dmg"],
+    "icon": "assets/icon.icns",
+    "category": "public.app-category.productivity"
+  }
+}

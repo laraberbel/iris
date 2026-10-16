@@ -1,0 +1,305 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+body {
+  background-color: #131313;
+  color: #9996BC;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(153, 150, 188, 0.2);
+  border-radius: 2px;
+}
+
+.titlebar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 34px;
+  background: #000000;
+  border-bottom: 1px solid rgba(153, 150, 188, 0.2);
+  padding: 0 10px;
+}
+
+.drag-region {
+  flex: 1;
+  -webkit-app-region: drag;
+  font-size: 0.68rem;
+  letter-spacing: 1.8px;
+  color: #9996BC;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drag-region::before {
+  content: "■";
+  font-size: 0.55rem;
+  color: #9996BC;
+  opacity: 0.7;
+}
+
+.window-controls {
+  display: flex;
+  gap: 4px;
+  -webkit-app-region: no-drag;
+}
+
+.control-btn {
+  background: transparent;
+  border: 1px solid rgba(153, 150, 188, 0.2);
+  color: #9996BC;
+  font-size: 0.75rem;
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  transition: all 0.15s ease;
+}
+
+.control-btn:hover {
+  background: rgba(153, 150, 188, 0.15);
+  border-color: #9996BC;
+}
+
+.control-btn.close:hover {
+  background: #9996BC;
+  color: #000000;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  position: relative;
+}
+
+.container::before {
+  content: "+";
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-size: 0.75rem;
+  color: rgba(153, 150, 188, 0.3);
+}
+
+.container::after {
+  content: "+";
+  position: absolute;
+  bottom: 14px;
+  right: 14px;
+  font-size: 0.75rem;
+  color: rgba(153, 150, 188, 0.3);
+}
+
+.badge {
+  border: 1px solid rgba(153, 150, 188, 0.35);
+  color: #9996BC;
+  background: rgba(153, 150, 188, 0.05);
+  padding: 4px 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+  border-radius: 2px;
+}
+
+.badge.break {
+  background: #9996BC;
+  color: #131313;
+  border-color: #9996BC;
+}
+
+.timer {
+  font-size: 4.8rem;
+  font-weight: 600;
+  color: #9996BC;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+
+.sub-info {
+  font-size: 0.7rem;
+  color: rgba(153, 150, 188, 0.7);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.telemetry-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 280px;
+  margin-top: 4px;
+  margin-bottom: 38px;
+  border-top: 1px dashed rgba(153, 150, 188, 0.2);
+  border-bottom: 1px dashed rgba(153, 150, 188, 0.2);
+  padding: 10px 4px;
+}
+
+.telemetry-label {
+  font-size: 0.62rem;
+  letter-spacing: 1.5px;
+  color: rgba(153, 150, 188, 0.6);
+  font-weight: 500;
+}
+
+.telemetry-label span {
+  color: #9996BC;
+  font-weight: 700;
+}
+
+.matrix-grid {
+  display: flex;
+  gap: 5px;
+}
+
+.cell {
+  width: 14px;
+  height: 6px;
+  border: 1px solid rgba(153, 150, 188, 0.35);
+  background: transparent;
+  border-radius: 1px;
+  transition: all 0.2s ease;
+}
+
+.cell.filled {
+  background: #9996BC;
+  border-color: #9996BC;
+  box-shadow: 0 0 6px rgba(153, 150, 188, 0.4);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.btn {
+  flex: 1;
+  padding: 11px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  border: 1px solid #9996BC;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn.primary {
+  background: #9996BC;
+  color: #131313;
+}
+
+.btn.primary:hover {
+  background: #b2afd6;
+  border-color: #b2afd6;
+}
+
+.btn.primary:active {
+  transform: translateY(1px);
+}
+
+.btn.secondary {
+  background: transparent;
+  color: #9996BC;
+  border-color: rgba(153, 150, 188, 0.3);
+}
+
+.btn.secondary:hover {
+  border-color: #9996BC;
+  background: rgba(153, 150, 188, 0.08);
+}
+
+.modal {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(19, 19, 19, 0.95);
+  backdrop-filter: blur(2px);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #000000;
+  border: 1px solid rgba(153, 150, 188, 0.35);
+  padding: 20px;
+  border-radius: 2px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-content h3 {
+  font-size: 0.75rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #9996BC;
+  border-bottom: 1px solid rgba(153, 150, 188, 0.2);
+  padding-bottom: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(153, 150, 188, 0.8);
+}
+
+.field input {
+  background: #131313;
+  border: 1px solid rgba(153, 150, 188, 0.3);
+  color: #9996BC;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  border-radius: 2px;
+  outline: none;
+}
+
+.field input:focus {
+  border-color: #9996BC;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}

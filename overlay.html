@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>IRIS // OCULAR_REST</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: #131313;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #9996BC;
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Retículas Técnicas nos Cantos */
+    .reticle {
+      position: absolute;
+      font-size: 0.8rem;
+      color: rgba(153, 150, 188, 0.35);
+      line-height: 1;
+    }
+    .reticle-tl { top: 20px; left: 20px; }
+    .reticle-tr { top: 20px; right: 20px; }
+    .reticle-bl { bottom: 20px; left: 20px; }
+    .reticle-br { bottom: 20px; right: 20px; }
+
+    .telemetry-header {
+      position: absolute;
+      top: 24px;
+      left: 44px;
+      right: 44px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: rgba(153, 150, 188, 0.45);
+      border-bottom: 1px dashed rgba(153, 150, 188, 0.15);
+      padding-bottom: 8px;
+    }
+
+    /* Caixa Central do HUD */
+    .hud-box {
+      border: 1px solid rgba(153, 150, 188, 0.3);
+      background: #000000;
+      padding: 36px 54px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      border-radius: 2px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    .tag-indicator {
+      position: absolute;
+      top: -9px;
+      left: 16px;
+      background: #000000;
+      padding: 0 8px;
+      font-size: 0.62rem;
+      letter-spacing: 1.8px;
+      color: #9996BC;
+      font-weight: 600;
+    }
+
+    /* Ícone Vetorial Animado da Íris */
+    .iris-icon-container {
+      width: 68px;
+      height: 68px;
+      margin-bottom: 18px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .iris-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Animação do anel externo tracejado */
+    .iris-outer-ring {
+      transform-origin: center;
+      animation: rotateRing 16s linear infinite;
+    }
+
+    /* Animação de dilatação da pupila central */
+    .iris-pupil {
+      transform-origin: center;
+      animation: breathePupil 4s ease-in-out infinite;
+    }
+
+    /* Animação de radar/scanner */
+    .iris-reticle {
+      transform-origin: center;
+      animation: pulseReticle 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes rotateRing {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes breathePupil {
+      0%, 100% {
+        transform: scale(0.85);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1.15);
+        opacity: 1;
+      }
+    }
+
+    @keyframes pulseReticle {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.85; }
+    }
+
+    .badge-protocol {
+      border: 1px solid rgba(153, 150, 188, 0.4);
+      background: rgba(153, 150, 188, 0.08);
+      color: #9996BC;
+      font-size: 0.65rem;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      margin-bottom: 12px;
+      border-radius: 2px;
+    }
+
+    h1 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #9996BC;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    p {
+      color: rgba(153, 150, 188, 0.7);
+      font-size: 0.8rem;
+      text-align: center;
+      line-height: 1.6;
+      letter-spacing: 0.8px;
+      margin-bottom: 18px;
+    }
+
+    .countdown-display {
+      font-size: 6.5rem;
+      font-weight: 700;
+      color: #9996BC;
+      line-height: 0.9;
+      margin-bottom: 18px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -2px;
+    }
+
+    .progress-track {
+      display: flex;
+      gap: 3px;
+      width: 100%;
+      max-width: 320px;
+      margin-bottom: 20px;
+    }
+
+    .progress-segment {
+      flex: 1;
+      height: 4px;
+      background: rgba(153, 150, 188, 0.15);
+      border-radius: 1px;
+      transition: background 0.3s ease;
+    }
+
+    .progress-segment.active {
+      background: #9996BC;
+      box-shadow: 0 0 5px rgba(153, 150, 188, 0.5);
+    }
+
+    .lock-notice {
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      color: rgba(153, 150, 188, 0.4);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lock-notice::before {
+      content: "■";
+      font-size: 0.5rem;
+      color: #9996BC;
+    }
+  </style>
+</head>
+<body>
+  <div class="reticle reticle-tl">+</div>
+  <div class="reticle reticle-tr">+</div>
+  <div class="reticle reticle-bl">+</div>
+  <div class="reticle reticle-br">+</div>
+
+  <header class="telemetry-header">
+    <span>IRIS // SYSTEM TELEMETRY</span>
+    <span>RULE: 20-20-20 // OCULAR RELIEF</span>
+    <span>CH: 01</span>
+  </header>
+
+  <div class="hud-box">
+    <div class="tag-indicator">SYS.LOCK // 20S</div>
+
+    <!-- ÍCONE TÉCNICO VETORIAL ANIMADO -->
+    <div class="iris-icon-container">
+      <svg class="iris-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Anel externo tracejado que gira -->
+        <circle class="iris-outer-ring" cx="50" cy="50" r="44" stroke="#9996BC" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.6"/>
+        
+        <!-- Retículas e miras cardeais -->
+        <g class="iris-reticle">
+          <line x1="50" y1="2" x2="50" y2="10" stroke="#9996BC" stroke-width="1.5"/>
+          <line x1="50" y1="90" x2="50" y2="98" stroke="#9996BC" stroke-width="1.5"/>
+          <line x1="2" y1="50" x2="10" y2="50" stroke="#9996BC" stroke-width="1.5"/>
+          <line x1="90" y1="50" x2="98" y2="50" stroke="#9996BC" stroke-width="1.5"/>
+        </g>
+        
+        <!-- Anel intermediário da íris -->
+        <circle cx="50" cy="50" r="28" stroke="#9996BC" stroke-width="1.2" opacity="0.4"/>
+        
+        <!-- Pupila central com pulso de respiração -->
+        <circle class="iris-pupil" cx="50" cy="50" r="14" fill="#9996BC"/>
+        <circle cx="50" cy="50" r="4" fill="#000000"/>
+      </svg>
+    </div>
+    
+    <div class="badge-protocol">DESVIO OCULAR OBRIGATÓRIO</div>
+    
+    <h1>Descanso de Visão Ativo</h1>
+    <p>Desvie o olhar do monitor. Foque um objeto distante (a mais de 6 metros) para permitir que os músculos ciliares relaxem por completo.</p>
+    
+    <div class="countdown-display" id="countdown">20</div>
+
+    <div class="progress-track" id="progressTrack"></div>
+
+    <div class="lock-notice">Interface bloqueada até o término</div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    const countdownEl = document.getElementById('countdown');
+    const progressTrack = document.getElementById('progressTrack');
+    
+    const TOTAL_SEGMENTS = 20;
+    let timer = null;
+
+    for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'progress-segment active';
+      progressTrack.appendChild(seg);
+    }
+
+    function updateSegments(remaining) {
+      const segments = progressTrack.children;
+      for (let i = 0; i < TOTAL_SEGMENTS; i++) {
+        if (i < remaining) {
+          segments[i].classList.add('active');
+        } else {
+          segments[i].classList.remove('active');
+        }
+      }
+    }
+
+    function finish() {
+      clearInterval(timer);
+      ipcRenderer.send('hide-eye-break');
+    }
+
+    ipcRenderer.on('start-countdown', (event, seconds) => {
+      let current = seconds;
+      countdownEl.textContent = String(current).padStart(2, '0');
+      updateSegments(current);
+
+      clearInterval(timer);
+      timer = setInterval(() => {
+        current--;
+        if (current <= 0) {
+          finish();
+        } else {
+          countdownEl.textContent = String(current).padStart(2, '0');
+          updateSegments(current);
+        }
+      }, 1000);
+    });
+
+    window.addEventListener('keydown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  </script>
+</body>
+</html>

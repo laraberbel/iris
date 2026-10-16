@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>IRIS // SYSTEM</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="titlebar">
+    <div class="drag-region">IRIS // 50-10-20</div>
+    <div class="window-controls">
+      <button id="configBtn" class="control-btn" title="Configurações">⚙</button>
+      <button id="minBtn" class="control-btn" title="Minimizar">&#8211;</button>
+      <button id="closeBtn" class="control-btn close" title="Fechar">&times;</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="badge" id="modeBadge">MOD // FOCO</div>
+    <div class="timer" id="timerDisplay">50:00</div>
+
+    <div class="sub-info" id="nextEyeBreak">Descanso visual em: 20:00</div>
+
+    <div class="telemetry-bar">
+      <div class="telemetry-label">CYCLES // <span id="cycleCount">0/4</span></div>
+      <div class="matrix-grid" id="cycleGrid">
+        <span class="cell"></span>
+        <span class="cell"></span>
+        <span class="cell"></span>
+        <span class="cell"></span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="startBtn" class="btn primary">Iniciar</button>
+      <button id="resetBtn" class="btn secondary">Resetar</button>
+    </div>
+  </main>
+
+  <div class="modal" id="configModal">
+    <div class="modal-content">
+      <h3>SYS.CONFIG // INTERVALOS</h3>
+      
+      <div class="field">
+        <label>Tempo de Foco (minutos):</label>
+        <input type="number" id="workInput" value="50" min="1" max="120">
+      </div>
+
+      <div class="field">
+        <label>Tempo de Descanso (minutos):</label>
+        <input type="number" id="breakInput" value="10" min="1" max="60">
+      </div>
+
+      <div class="modal-buttons">
+        <button id="saveConfigBtn" class="btn primary">Salvar</button>
+        <button id="closeConfigBtn" class="btn secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
