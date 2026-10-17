@@ -1,7 +1,7 @@
 {
   "name": "iris",
   "productName": "Iris",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Smart Pomodoro & Eye Strain Relief",
   "main": "main.js",
   "scripts": {

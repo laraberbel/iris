@@ -85,7 +85,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 20px;
+  padding: 20px;
   position: relative;
 }
 
@@ -116,7 +116,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border-radius: 2px;
 }
 
@@ -140,7 +140,73 @@ body {
   color: rgba(153, 150, 188, 0.7);
   letter-spacing: 1px;
   text-transform: uppercase;
+  margin-bottom: 8px;
+  min-height: 18px;
+}
+
+/* Caixa com o Ícone Oficial e Dica */
+.break-tip {
+  display: none;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(153, 150, 188, 0.05);
+  border: 1px solid rgba(153, 150, 188, 0.25);
+  border-left: 3px solid #9996BC;
+  padding: 10px 12px;
+  width: 100%;
+  max-width: 280px;
   margin-bottom: 16px;
+  border-radius: 2px;
+}
+
+.tip-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tip-app-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 2px;
+  animation: pulseIcon 3.5s ease-in-out infinite;
+}
+
+@keyframes pulseIcon {
+  0%, 100% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 2px rgba(153, 150, 188, 0.2));
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(153, 150, 188, 0.5));
+    transform: scale(1.05);
+  }
+}
+
+.tip-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tip-tag {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: rgba(153, 150, 188, 0.55);
+}
+
+.tip-content p {
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: #9996BC;
+  letter-spacing: 0.4px;
 }
 
 .telemetry-bar {
@@ -150,10 +216,10 @@ body {
   width: 100%;
   max-width: 280px;
   margin-top: 4px;
-  margin-bottom: 38px;
+  margin-bottom: 26px;
   border-top: 1px dashed rgba(153, 150, 188, 0.2);
   border-bottom: 1px dashed rgba(153, 150, 188, 0.2);
-  padding: 10px 4px;
+  padding: 8px 4px;
 }
 
 .telemetry-label {
@@ -209,6 +275,11 @@ body {
 }
 
 .btn.primary {
+  background: #9996BC;
+  color: #131313;
+}
+
+.btn.primary.break {
   background: #9996BC;
   color: #131313;
 }
@@ -284,7 +355,7 @@ body {
   color: rgba(153, 150, 188, 0.8);
 }
 
-.field input {
+.field input[type="number"] {
   background: #131313;
   border: 1px solid rgba(153, 150, 188, 0.3);
   color: #9996BC;
@@ -294,8 +365,24 @@ body {
   outline: none;
 }
 
-.field input:focus {
+.field input[type="number"]:focus {
   border-color: #9996BC;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.65rem;
+  color: #9996BC;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.custom-checkbox input {
+  accent-color: #9996BC;
+  cursor: pointer;
 }
 
 .modal-buttons {

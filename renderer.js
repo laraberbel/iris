@@ -9,6 +9,7 @@ const TOTAL_CYCLES = 4;
 let isWorking = true;
 let isRunning = false;
 let isOverlayActive = false;
+let soundEnabled = true;
 let completedCycles = 0;
 
 let mainTimeRemaining = workMinutes * 60;
@@ -18,13 +19,25 @@ let mainEndTime = null;
 let eyeBreakEndTime = null;
 let ticker = null;
 
+const breakTips = [
+  "SYS.POSTURE // Levante-se e alongue a coluna. Caminhe alguns passos para reativar a circulação.",
+  "CORPO // Rotação suave dos ombros para trás e incline a cabeça devagar para cada lado.",
+  "ERGONOMIA // Estique os braços acima da cabeça, entrelace os dedos e respire fundo.",
+  "CIRCULAÇÃO // Afaste-se da tela, beba um copo de água e movimente as pernas.",
+  "RESET FÍSICO // Alivie a tensão dos pulsos e antebraços com movimentos circulares.",
+  "FOCO // Olhe para a linha do horizonte ou pela janela enquanto solta os ombros."
+];
+
 const timerDisplay = document.getElementById('timerDisplay');
 const modeBadge = document.getElementById('modeBadge');
 const nextEyeBreak = document.getElementById('nextEyeBreak');
+const breakTip = document.getElementById('breakTip');
+const tipText = document.getElementById('tipText');
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
 const minBtn = document.getElementById('minBtn');
 const closeBtn = document.getElementById('closeBtn');
+const windchimeAudio = document.getElementById('windchimeAudio');
 
 const cycleCountEl = document.getElementById('cycleCount');
 const cells = document.querySelectorAll('.matrix-grid .cell');
@@ -35,6 +48,7 @@ const saveConfigBtn = document.getElementById('saveConfigBtn');
 const closeConfigBtn = document.getElementById('closeConfigBtn');
 const workInput = document.getElementById('workInput');
 const breakInput = document.getElementById('breakInput');
+const soundToggle = document.getElementById('soundToggle');
 
 function formatTime(seconds) {
   const m = String(Math.floor(Math.max(0, seconds) / 60)).padStart(2, '0');
@@ -48,8 +62,10 @@ function updateDisplays() {
   if (isWorking) {
     nextEyeBreak.textContent = `Descanso visual em: ${formatTime(eyeBreakRemaining)}`;
     nextEyeBreak.style.display = 'block';
+    breakTip.style.display = 'none';
   } else {
     nextEyeBreak.style.display = 'none';
+    breakTip.style.display = 'flex';
   }
 }
 
@@ -66,6 +82,14 @@ function updateCycleUI() {
   });
 }
 
+function playWindchime() {
+  if (soundEnabled && windchimeAudio) {
+    windchimeAudio.currentTime = 0;
+    windchimeAudio.volume = 0.5;
+    windchimeAudio.play().catch(() => {});
+  }
+}
+
 function startTimer() {
   isRunning = true;
   startBtn.textContent = 'Pausar';
@@ -80,7 +104,7 @@ function startTimer() {
 
 function pauseTimer() {
   isRunning = false;
-  startBtn.textContent = 'Iniciar';
+  startBtn.textContent = isWorking ? 'Iniciar' : 'Iniciar Descanso';
   clearInterval(ticker);
   ticker = null;
 }
@@ -90,6 +114,7 @@ function updateLoop() {
 
   const now = Date.now();
 
+  // Contador de micropausa de 20s (apenas no modo foco)
   if (isWorking) {
     const eyeDiff = Math.round((eyeBreakEndTime - now) / 1000);
     eyeBreakRemaining = Math.max(0, eyeDiff);
@@ -97,29 +122,41 @@ function updateLoop() {
     if (eyeBreakRemaining <= 0) {
       isOverlayActive = true;
       mainTimeRemaining = Math.max(0, Math.round((mainEndTime - now) / 1000));
-      ipcRenderer.send('show-eye-break', EYE_BREAK_DURATION);
+      ipcRenderer.send('show-eye-break', { seconds: EYE_BREAK_DURATION, sound: soundEnabled });
       return;
     }
   }
 
+  // Contador do Bloco Principal
   const mainDiff = Math.round((mainEndTime - now) / 1000);
   mainTimeRemaining = Math.max(0, mainDiff);
 
   if (mainTimeRemaining <= 0) {
     if (isWorking) {
+      pauseTimer();
       isWorking = false;
       completedCycles++;
       updateCycleUI();
 
       mainTimeRemaining = breakMinutes * 60;
+      eyeBreakRemaining = eyeBreakMinutes * 60;
+
       modeBadge.textContent = 'MOD // DESCANSO';
       modeBadge.classList.add('break');
       startBtn.classList.add('break');
+      startBtn.textContent = 'Iniciar Descanso';
+
+      const randomTip = breakTips[Math.floor(Math.random() * breakTips.length)];
+      tipText.textContent = randomTip;
+
+      ipcRenderer.send('focus-main-window');
+      playWindchime();
 
       new Notification('IRIS // ALERTA', {
-        body: `Bloco de foco concluído. Descanso longo iniciado (${breakMinutes}m).`
+        body: `Bloco de foco concluído. Clique para iniciar o descanso de ${breakMinutes} minutos.`
       });
     } else {
+      pauseTimer();
       isWorking = true;
       mainTimeRemaining = workMinutes * 60;
       eyeBreakRemaining = eyeBreakMinutes * 60;
@@ -127,15 +164,15 @@ function updateLoop() {
       modeBadge.textContent = 'MOD // FOCO';
       modeBadge.classList.remove('break');
       startBtn.classList.remove('break');
+      startBtn.textContent = 'Iniciar';
+
+      ipcRenderer.send('focus-main-window');
+      playWindchime();
 
       new Notification('IRIS // ALERTA', {
-        body: `Intervalo finalizado. Iniciando bloco de trabalho (${workMinutes}m).`
+        body: `Intervalo finalizado. Pronto para iniciar o bloco de trabalho de ${workMinutes} minutos.`
       });
     }
-
-    const resetNow = Date.now();
-    mainEndTime = resetNow + (mainTimeRemaining * 1000);
-    eyeBreakEndTime = resetNow + (eyeBreakRemaining * 1000);
   }
 
   updateDisplays();
@@ -174,6 +211,7 @@ resetBtn.addEventListener('click', () => {
   modeBadge.textContent = 'MOD // FOCO';
   modeBadge.classList.remove('break');
   startBtn.classList.remove('break');
+  startBtn.textContent = 'Iniciar';
 
   updateDisplays();
   updateCycleUI();
@@ -182,6 +220,7 @@ resetBtn.addEventListener('click', () => {
 configBtn.addEventListener('click', () => {
   workInput.value = workMinutes;
   breakInput.value = breakMinutes;
+  soundToggle.checked = soundEnabled;
   configModal.classList.add('active');
 });
 
@@ -192,6 +231,7 @@ closeConfigBtn.addEventListener('click', () => {
 saveConfigBtn.addEventListener('click', () => {
   const newWork = parseInt(workInput.value, 10);
   const newBreak = parseInt(breakInput.value, 10);
+  soundEnabled = soundToggle.checked;
 
   if (newWork > 0 && newBreak > 0) {
     workMinutes = newWork;

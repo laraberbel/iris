@@ -19,8 +19,8 @@ function setupAutoUpdates() {
     dialog.showMessageBox(mainWindow, {
       type: 'info',
       title: 'IRIS // ATUALIZAÇÃO DISPONÍVEL',
-      message: `Versão ${info.version} baixada com sucesso.`,
-      detail: 'Deseja reiniciar o aplicativo agora para aplicar a atualização?',
+      message: `Versão ${info.version} descarregada com sucesso.`,
+      detail: 'Deseja reiniciar a aplicação agora para aplicar a atualização?',
       buttons: ['Reiniciar Agora', 'Depois'],
       defaultId: 0
     }).then((res) => {
@@ -32,7 +32,7 @@ function setupAutoUpdates() {
   });
 
   autoUpdater.on('error', (err) => {
-    console.error('Erro na checagem de atualizações:', err);
+    console.error('Erro na verificação de atualizações:', err);
   });
 }
 
@@ -74,7 +74,7 @@ function createTray() {
 function createWindows() {
   mainWindow = new BrowserWindow({
     width: 380,
-    height: 560,
+    height: 590,
     resizable: false,
     frame: false,
     webPreferences: {
@@ -113,8 +113,17 @@ function createWindows() {
   ipcMain.on('window-minimize', () => mainWindow.minimize());
   ipcMain.on('window-close', () => mainWindow.hide());
 
-  ipcMain.on('show-eye-break', (event, seconds) => {
-    overlayWindow.webContents.send('start-countdown', seconds);
+  // Traz a janela principal para primeiro plano no final dos 50 minutos
+  ipcMain.on('focus-main-window', () => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      if (!mainWindow.isVisible()) mainWindow.show();
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+
+  ipcMain.on('show-eye-break', (event, data) => {
+    overlayWindow.webContents.send('start-countdown', data);
     overlayWindow.show();
     overlayWindow.focus();
   });
@@ -155,6 +164,4 @@ app.on('before-quit', () => {
   isQuiting = true;
 });
 
-app.on('window-all-closed', () => {
-  // Mantém processo rodando em segundo plano no Tray
-});
+app.on('window-all-closed', () => {});

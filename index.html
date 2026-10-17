@@ -21,6 +21,17 @@
 
     <div class="sub-info" id="nextEyeBreak">Descanso visual em: 20:00</div>
 
+    <!-- Dica ergonómica da pausa longa com o ícone oficial -->
+    <div class="break-tip" id="breakTip">
+      <div class="tip-icon-wrapper">
+        <img src="assets/icon.png" alt="Iris Icon" class="tip-app-icon">
+      </div>
+      <div class="tip-content">
+        <span class="tip-tag">SYS.POSTURE // PROTOCOLO ATIVO</span>
+        <p id="tipText"></p>
+      </div>
+    </div>
+
     <div class="telemetry-bar">
       <div class="telemetry-label">CYCLES // <span id="cycleCount">0/4</span></div>
       <div class="matrix-grid" id="cycleGrid">
@@ -37,6 +48,7 @@
     </div>
   </main>
 
+  <!-- Modal de Configuração -->
   <div class="modal" id="configModal">
     <div class="modal-content">
       <h3>SYS.CONFIG // INTERVALOS</h3>
@@ -51,12 +63,21 @@
         <input type="number" id="breakInput" value="10" min="1" max="60">
       </div>
 
+      <div class="field">
+        <label class="custom-checkbox">
+          <input type="checkbox" id="soundToggle" checked>
+          <span>Alertas Sonoros (bowl / windchime)</span>
+        </label>
+      </div>
+
       <div class="modal-buttons">
         <button id="saveConfigBtn" class="btn primary">Salvar</button>
         <button id="closeConfigBtn" class="btn secondary">Cancelar</button>
       </div>
     </div>
   </div>
+
+  <audio id="windchimeAudio" src="assets/windchime.wav" preload="auto"></audio>
 
   <script src="renderer.js"></script>
 </body>

@@ -28,7 +28,6 @@
       overflow: hidden;
     }
 
-    /* Retículas Técnicas nos Cantos */
     .reticle {
       position: absolute;
       font-size: 0.8rem;
@@ -54,7 +53,6 @@
       padding-bottom: 8px;
     }
 
-    /* Caixa Central do HUD */
     .hud-box {
       border: 1px solid rgba(153, 150, 188, 0.3);
       background: #000000;
@@ -80,7 +78,6 @@
       font-weight: 600;
     }
 
-    /* Ícone Vetorial Animado da Íris */
     .iris-icon-container {
       width: 68px;
       height: 68px;
@@ -97,19 +94,16 @@
       overflow: visible;
     }
 
-    /* Animação do anel externo tracejado */
     .iris-outer-ring {
       transform-origin: center;
       animation: rotateRing 16s linear infinite;
     }
 
-    /* Animação de dilatação da pupila central */
     .iris-pupil {
       transform-origin: center;
       animation: breathePupil 4s ease-in-out infinite;
     }
 
-    /* Animação de radar/scanner */
     .iris-reticle {
       transform-origin: center;
       animation: pulseReticle 2s ease-in-out infinite alternate;
@@ -230,24 +224,16 @@
   <div class="hud-box">
     <div class="tag-indicator">SYS.LOCK // 20S</div>
 
-    <!-- ÍCONE TÉCNICO VETORIAL ANIMADO -->
     <div class="iris-icon-container">
       <svg class="iris-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Anel externo tracejado que gira -->
         <circle class="iris-outer-ring" cx="50" cy="50" r="44" stroke="#9996BC" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.6"/>
-        
-        <!-- Retículas e miras cardeais -->
         <g class="iris-reticle">
           <line x1="50" y1="2" x2="50" y2="10" stroke="#9996BC" stroke-width="1.5"/>
           <line x1="50" y1="90" x2="50" y2="98" stroke="#9996BC" stroke-width="1.5"/>
           <line x1="2" y1="50" x2="10" y2="50" stroke="#9996BC" stroke-width="1.5"/>
           <line x1="90" y1="50" x2="98" y2="50" stroke="#9996BC" stroke-width="1.5"/>
         </g>
-        
-        <!-- Anel intermediário da íris -->
         <circle cx="50" cy="50" r="28" stroke="#9996BC" stroke-width="1.2" opacity="0.4"/>
-        
-        <!-- Pupila central com pulso de respiração -->
         <circle class="iris-pupil" cx="50" cy="50" r="14" fill="#9996BC"/>
         <circle cx="50" cy="50" r="4" fill="#000000"/>
       </svg>
@@ -256,7 +242,7 @@
     <div class="badge-protocol">DESVIO OCULAR OBRIGATÓRIO</div>
     
     <h1>Descanso de Visão Ativo</h1>
-    <p>Desvie o olhar do monitor. Foque um objeto distante (a mais de 6 metros) para permitir que os músculos ciliares relaxem por completo.</p>
+    <p>Desvie o olhar da tela. Foque um objeto distante (a mais de 6 metros) para permitir que os músculos ciliares relaxem por completo.</p>
     
     <div class="countdown-display" id="countdown">20</div>
 
@@ -265,10 +251,13 @@
     <div class="lock-notice">Interface bloqueada até o término</div>
   </div>
 
+  <audio id="bowlAudio" src="assets/bowl.wav" preload="auto"></audio>
+
   <script>
     const { ipcRenderer } = require('electron');
     const countdownEl = document.getElementById('countdown');
     const progressTrack = document.getElementById('progressTrack');
+    const bowlAudio = document.getElementById('bowlAudio');
     
     const TOTAL_SEGMENTS = 20;
     let timer = null;
@@ -290,12 +279,27 @@
       }
     }
 
+    function playBowlSound() {
+      if (bowlAudio) {
+        bowlAudio.currentTime = 0;
+        bowlAudio.volume = 0.45;
+        bowlAudio.play().catch(() => {});
+      }
+    }
+
     function finish() {
       clearInterval(timer);
       ipcRenderer.send('hide-eye-break');
     }
 
-    ipcRenderer.on('start-countdown', (event, seconds) => {
+    ipcRenderer.on('start-countdown', (event, data) => {
+      const seconds = typeof data === 'object' ? data.seconds : data;
+      const shouldPlaySound = typeof data === 'object' ? data.sound : true;
+
+      if (shouldPlaySound) {
+        playBowlSound();
+      }
+
       let current = seconds;
       countdownEl.textContent = String(current).padStart(2, '0');
       updateSegments(current);
