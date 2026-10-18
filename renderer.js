@@ -1,5 +1,3 @@
-const { ipcRenderer } = require('electron');
-
 let workMinutes = 50;
 let breakMinutes = 10;
 let eyeBreakMinutes = 20;
@@ -122,7 +120,7 @@ function updateLoop() {
     if (eyeBreakRemaining <= 0) {
       isOverlayActive = true;
       mainTimeRemaining = Math.max(0, Math.round((mainEndTime - now) / 1000));
-      ipcRenderer.send('show-eye-break', { seconds: EYE_BREAK_DURATION, sound: soundEnabled });
+      window.iris.showEyeBreak({ seconds: EYE_BREAK_DURATION, sound: soundEnabled });
       return;
     }
   }
@@ -149,11 +147,11 @@ function updateLoop() {
       const randomTip = breakTips[Math.floor(Math.random() * breakTips.length)];
       tipText.textContent = randomTip;
 
-      ipcRenderer.send('focus-main-window');
+      window.iris.focusMainWindow();
       playWindchime();
 
       new Notification('IRIS // ALERTA', {
-        body: `Bloco de foco concluído. Clique para iniciar o descanso de ${breakMinutes} minutos.`
+        body: `Bloco de foco concluído. Inicie o descanso de ${breakMinutes} minutos na Iris.`
       });
     } else {
       pauseTimer();
@@ -166,7 +164,7 @@ function updateLoop() {
       startBtn.classList.remove('break');
       startBtn.textContent = 'Iniciar';
 
-      ipcRenderer.send('focus-main-window');
+      window.iris.focusMainWindow();
       playWindchime();
 
       new Notification('IRIS // ALERTA', {
@@ -178,7 +176,7 @@ function updateLoop() {
   updateDisplays();
 }
 
-ipcRenderer.on('eye-break-completed', () => {
+window.iris.onEyeBreakCompleted(() => {
   isOverlayActive = false;
   eyeBreakRemaining = eyeBreakMinutes * 60;
 
@@ -229,24 +227,27 @@ closeConfigBtn.addEventListener('click', () => {
 });
 
 saveConfigBtn.addEventListener('click', () => {
-  const newWork = parseInt(workInput.value, 10);
-  const newBreak = parseInt(breakInput.value, 10);
+  const newWork = workInput.valueAsNumber;
+  const newBreak = breakInput.valueAsNumber;
+  workInput.setCustomValidity(Number.isInteger(newWork) ? '' : 'Informe um número inteiro de minutos.');
+  breakInput.setCustomValidity(Number.isInteger(newBreak) ? '' : 'Informe um número inteiro de minutos.');
+
+  if (!workInput.reportValidity() || !breakInput.reportValidity()) return;
+
   soundEnabled = soundToggle.checked;
+  workMinutes = newWork;
+  breakMinutes = newBreak;
 
-  if (newWork > 0 && newBreak > 0) {
-    workMinutes = newWork;
-    breakMinutes = newBreak;
-
-    if (!isRunning && isWorking) {
-      mainTimeRemaining = workMinutes * 60;
-      updateDisplays();
-    }
+  if (!isRunning && isWorking) {
+    mainTimeRemaining = workMinutes * 60;
+    updateDisplays();
   }
+
   configModal.classList.remove('active');
 });
 
-minBtn.addEventListener('click', () => ipcRenderer.send('window-minimize'));
-closeBtn.addEventListener('click', () => ipcRenderer.send('window-close'));
+minBtn.addEventListener('click', () => window.iris.minimize());
+closeBtn.addEventListener('click', () => window.iris.quit());
 
 updateDisplays();
 updateCycleUI();

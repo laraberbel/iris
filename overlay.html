@@ -207,6 +207,23 @@
       font-size: 0.5rem;
       color: #9996BC;
     }
+
+    .quit-button {
+      margin-top: 16px;
+      padding: 8px 12px;
+      border: 1px solid rgba(153, 150, 188, 0.35);
+      border-radius: 2px;
+      background: transparent;
+      color: rgba(153, 150, 188, 0.65);
+      font-size: 0.6rem;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+    }
+
+    .quit-button:hover {
+      border-color: #9996BC;
+      color: #9996BC;
+    }
   </style>
 </head>
 <body>
@@ -248,16 +265,17 @@
 
     <div class="progress-track" id="progressTrack"></div>
 
-    <div class="lock-notice">Interface bloqueada até o término</div>
+    <div class="lock-notice">Pressione ESC para encerrar esta pausa</div>
+    <button class="quit-button" id="quitAppBtn" type="button">Sair completamente da Iris</button>
   </div>
 
   <audio id="bowlAudio" src="assets/bowl.wav" preload="auto"></audio>
 
   <script>
-    const { ipcRenderer } = require('electron');
     const countdownEl = document.getElementById('countdown');
     const progressTrack = document.getElementById('progressTrack');
     const bowlAudio = document.getElementById('bowlAudio');
+    const quitAppBtn = document.getElementById('quitAppBtn');
     
     const TOTAL_SEGMENTS = 20;
     let timer = null;
@@ -289,10 +307,12 @@
 
     function finish() {
       clearInterval(timer);
-      ipcRenderer.send('hide-eye-break');
+      window.iris.hideEyeBreak();
     }
 
-    ipcRenderer.on('start-countdown', (event, data) => {
+    quitAppBtn.addEventListener('click', () => window.iris.quit());
+
+    window.iris.onStartEyeBreak((data) => {
       const seconds = typeof data === 'object' ? data.seconds : data;
       const shouldPlaySound = typeof data === 'object' ? data.sound : true;
 
@@ -317,6 +337,11 @@
     });
 
     window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        clearInterval(timer);
+        timer = null;
+        window.iris.hideEyeBreak();
+      }
       e.preventDefault();
       e.stopPropagation();
     });
